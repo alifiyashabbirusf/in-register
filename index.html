@@ -28,7 +28,7 @@ p{margin:0}
 @media (max-width:760px){.studio{grid-template-columns:1fr}}
 .phone{position:relative;width:100%;max-width:340px;margin:0 auto;border-radius:38px;overflow:hidden;border:6px solid var(--indigo);background:var(--indigo);aspect-ratio:390/844}
 .phone canvas{display:block;width:100%;height:100%}
-.clock{position:absolute;left:0;right:0;top:8.5%;text-align:center;pointer-events:none;font-family:-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;line-height:1}
+.clock{color:#fff;text-shadow:0 1px 3px rgba(20,10,12,.28),0 0 14px rgba(20,10,12,.12);position:absolute;left:0;right:0;top:8.5%;text-align:center;pointer-events:none;font-family:-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;line-height:1}
 .clock .d{font-size:clamp(13px,4.6cqw,17px);font-weight:600;opacity:.85}
 .clock .t{font-size:clamp(56px,25cqw,86px);font-weight:700;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
 .phone{container-type:inline-size}
@@ -126,8 +126,8 @@ footer{border-top:2px solid var(--indigo);padding-top:16px;font-size:15px;color:
       <input type="range" id="day" min="0" max="15" step="1" value="0">
       <div class="ticks"><span id="tickA">Start</span><span id="dayOut">14 days left</span><span>After</span></div>
       <div class="row">
+        <button type="button" class="primary" id="play">Play the countdown</button>
         <button type="button" id="today">Back to today</button>
-        <button type="button" id="play">Play the last day</button>
       </div>
     </div>
 
@@ -317,10 +317,12 @@ Every day at 8 am until 30 November, check the assignment countdown in this chat
   <details>
     <summary>Set up the daily swap on an iPhone</summary>
     <ol class="steps" style="margin-top:14px">
-      <li>Press Save every day as a zip, then open the zip in the Files app and keep the images together in one folder.</li>
-      <li>In the Shortcuts app, open Automation and create a new automation that runs at a set time every day.</li>
-      <li>Add actions that format the current date as year-month-day, get the file with that name from your folder, and set it as the lock screen wallpaper.</li>
-      <li>Set the automation to run without asking, then run it once by hand to check it.</li>
+      <li>Press Save every day as a zip. In the Files app, tap the zip once to unzip it. You get a folder of images named by date, such as 2026-11-17.png.</li>
+      <li>In the Shortcuts app, open Automation, tap the plus, choose Time of Day, set a time such as 6:00 am, Daily, and Run Immediately.</li>
+      <li>Add Format Date: Date = Current Date, Date Format = Custom, format string yyyy-MM-dd.</li>
+      <li>Add Get File from Folder: pick the unzipped folder, and for the file path insert the Formatted Date, then type .png after it. Turn off Error If Not Found.</li>
+      <li>Add Set Wallpaper Photo: choose Lock Screen, and turn off Show Preview and Crop to Subject.</li>
+      <li>Tap Done. To test it now, open the automation and run it once.</li>
     </ol>
   </details>
 </section>
@@ -331,7 +333,7 @@ Every day at 8 am until 30 November, check the assignment countdown in this chat
     <li>Choose a colour, then press Save this day. On a phone, press and hold the image and choose Save to Photos.</li>
     <li>Open Settings, then Wallpaper, then Add New Wallpaper, then Photos, and pick the image.</li>
     <li>Leave Extend Wallpaper off. It pushes the number down and cuts off its foot.</li>
-    <li>On the cream version, tap the clock on the Customise screen and choose a dark blue so the time is easy to read.</li>
+    <li>Keep the clock white. It sits in the empty space at the top, clear of the text.</li>
   </ol>
 </section>
 
@@ -447,7 +449,7 @@ function refresh(){
   var sl=$("day");sl.max=span()+1;sl.value=n>span()?0:(n<0?span()+1:span()-n);
   $("dayOut").textContent=describe(n);$("tickA").textContent=md(dateFor(span()));
   cv.setAttribute("aria-label","Lock screen wallpaper: "+describe(n));
-  var ck=$("clock");ck.style.display=st.clock==="on"?"block":"none";ck.style.color=(st.scheme==="light"&&n!==0)?C.indigo:"#ffffff";
+  var ck=$("clock");ck.style.display=st.clock==="on"?"block":"none";ck.style.color="#ffffff";
   var pl=$("plan");pl.textContent="";var nextC=-1;CHECK.forEach(function(c){if(c[0]<=n&&c[0]>nextC)nextC=c[0];});
   CHECK.forEach(function(c){var li=document.createElement("li"),s=n<c[0]?"done":(c[0]===nextC?"next":"");if(n<0)s="done";li.className=s;
     li.innerHTML='<span class="dot"></span><span class="dt"></span><span class="nm"></span><span class="st"></span>';
@@ -458,7 +460,7 @@ function tickClock(){var d=new Date(),h=d.getHours()%12||12,m=("0"+d.getMinutes(
 function slam(){
   if(anim)cancelAnimationFrame(anim);
   if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){paint();return;}
-  var t0=null;function f(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/900);paint(p);if(p>=0.55)$("clock").style.color="#ffffff";if(p<1)anim=requestAnimationFrame(f);else{anim=null;paint();}}
+  var t0=null;function f(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/900);paint(p);if(p<1)anim=requestAnimationFrame(f);else{anim=null;paint();}}
   anim=requestAnimationFrame(f);
 }
 function strip(){
@@ -514,9 +516,24 @@ function ics(){
 $("saveIcs").addEventListener("click",function(){download(new Blob([ics()],{type:"text/calendar"}),"in-register-reminders.ics");say("Calendar file saved. Open it to add the reminders.");});
 
 /* controls */
-$("day").addEventListener("input",function(){var v=+this.value,n=span()-v;sel=n<0?-1:n;if(anim){cancelAnimationFrame(anim);anim=null;}refresh();if(sel===0)slam();});
-$("today").addEventListener("click",function(){sel=null;refresh();});
-$("play").addEventListener("click",function(){sel=0;refresh();$("clock").style.color=st.scheme==="light"?C.indigo:"#ffffff";slam();});
+$("day").addEventListener("input",function(){stopTour();var v=+this.value,n=span()-v;sel=n<0?-1:n;if(anim){cancelAnimationFrame(anim);anim=null;}refresh();if(sel===0)slam();});
+$("today").addEventListener("click",function(){stopTour();sel=null;refresh();});
+var tour=null;
+function stopTour(){if(tour){clearTimeout(tour);tour=null;}$("play").textContent="Play the countdown";}
+function playTour(){
+  stopTour();if(anim){cancelAnimationFrame(anim);anim=null;}
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var n=span();$("play").textContent="Playing";
+  function step(){
+    sel=n;refresh();
+    if(n>0){n--;tour=setTimeout(step,reduce?700:(n>=9?260:380));}
+    else if(n===0){slam();n=-1;tour=setTimeout(step,2600);}
+    else{tour=setTimeout(function(){tour=null;sel=null;refresh();$("play").textContent="Play again";},2200);}
+  }
+  step();
+}
+$("play").addEventListener("click",playTour);
+window.addEventListener("load",function(){setTimeout(function(){if(sel===null)playTour();},900);});
 [["sLight","scheme"],["sDark","scheme"],["ckOn","clock"],["ckOff","clock"]].forEach(function(a){$(a[0]).addEventListener("change",function(){st[a[1]]=this.value;persist();all();});});
 function fill(){$("fDate").value=st.date;$("fLabel").value=st.label;$("fGo").value=st.go;$("fDone").value=st.done;$("fTasks").value=st.tasks.join("\n");$(st.scheme==="dark"?"sDark":"sLight").checked=true;$(st.clock==="off"?"ckOff":"ckOn").checked=true;}
 $("fDate").addEventListener("change",function(){if(this.value){st.date=this.value;sel=null;persist();all();}});
