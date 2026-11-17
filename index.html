@@ -319,10 +319,10 @@ Every day at 8 am until 30 November, check the assignment countdown in this chat
     <ol class="steps" style="margin-top:14px">
       <li>Press Save every day as a zip. In the Files app, tap the zip once to unzip it. You get a folder of images named by date, such as 2026-11-17.png.</li>
       <li>In the Shortcuts app, open Automation, tap the plus, choose Time of Day, set a time such as 6:00 am, Daily, and Run Immediately.</li>
-      <li>Add Format Date: Date = Current Date, Date Format = Custom, format string yyyy-MM-dd.</li>
+      <li>Add Format Date: Date = Current Date, Date Format = Custom, format string yyyy-MM-dd. Check there is no space before or after it: a hidden space makes the shortcut look for a file that does not exist.</li>
       <li>Add Get File from Folder: pick the unzipped folder, and for the file path insert the Formatted Date, then type .png after it. Turn off Error If Not Found.</li>
       <li>Add Set Wallpaper Photo: choose Lock Screen, and turn off Show Preview and Crop to Subject.</li>
-      <li>Tap Done. To test it now, open the automation and run it once.</li>
+      <li>Tap Done. To test it now, open the automation and tap the play button. If it says the file doesn't exist, the error shows the exact name it looked for, so you can spot a stray space or a wrong format.</li>
     </ol>
   </details>
 </section>
