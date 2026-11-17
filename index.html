@@ -523,12 +523,14 @@ function stopTour(){if(tour){clearTimeout(tour);tour=null;}$("play").textContent
 function playTour(){
   stopTour();if(anim){cancelAnimationFrame(anim);anim=null;}
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var n=span();$("play").textContent="Playing";
+  /* key days only, each held long enough to read */
+  var stops=[14,10,9,6,2].filter(function(d){return d<=span();}),i=0,HOLD=reduce?2200:1800;
+  $("play").textContent="Playing";
   function step(){
-    sel=n;refresh();
-    if(n>0){n--;tour=setTimeout(step,reduce?700:(n>=9?260:380));}
-    else if(n===0){slam();n=-1;tour=setTimeout(step,2600);}
-    else{tour=setTimeout(function(){tour=null;sel=null;refresh();$("play").textContent="Play again";},2200);}
+    if(i<stops.length){sel=stops[i++];refresh();tour=setTimeout(step,HOLD);}
+    else if(i===stops.length){i++;sel=0;refresh();slam();tour=setTimeout(step,3000);}
+    else if(i===stops.length+1){i++;sel=-1;refresh();tour=setTimeout(step,2600);}
+    else{tour=null;sel=null;refresh();$("play").textContent="Play again";}
   }
   step();
 }
