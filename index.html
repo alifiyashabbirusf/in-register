@@ -466,10 +466,11 @@ function slam(){
   anim=requestAnimationFrame(f);
 }
 function strip(){
-  var host=$("strip");host.textContent="";var sp=span();
-  [[sp,sp+" days"],[Math.max(1,Math.round(sp/2)),Math.max(1,Math.round(sp/2))+" days"],[Math.min(3,sp),Math.min(3,sp)+" days"],[0,"The day"],[-1,"After"]].forEach(function(a){
-    var fg=document.createElement("figure"),c=document.createElement("canvas");c.width=390;c.height=844;c.setAttribute("role","img");c.setAttribute("aria-label",describe(a[0]));
-    draw(c.getContext("2d"),1,st.scheme,a[0]);var cap=document.createElement("figcaption");cap.textContent=a[1];fg.appendChild(c);fg.appendChild(cap);host.appendChild(fg);});
+  /* same five moments as the cover: cream and dark teal alternate */
+  var host=$("strip");host.textContent="";var sp=span(),mid=Math.max(1,Math.round(sp/2)),last=Math.min(3,sp);
+  [[sp,sp+" days left","light"],[mid,mid+" days left","dark"],[last,last+" days left","light"],[0,"The deadline","light"],[-1,"After","dark"]].forEach(function(a){
+    var fg=document.createElement("figure"),c=document.createElement("canvas");c.width=390;c.height=844;c.setAttribute("role","img");c.setAttribute("aria-label",describe(a[0])+(a[2]==="dark"?", dark teal":", cream"));
+    draw(c.getContext("2d"),1,a[2],a[0]);var cap=document.createElement("figcaption");cap.textContent=a[1];fg.appendChild(c);fg.appendChild(cap);host.appendChild(fg);});
 }
 function all(){refresh();strip();}
 
