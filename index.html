@@ -524,7 +524,7 @@ function playTour(){
   stopTour();if(anim){cancelAnimationFrame(anim);anim=null;}
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   /* key days only, each held long enough to read */
-  var stops=[14,10,9,6,2].filter(function(d){return d<=span();}),i=0,HOLD=reduce?2200:1800;
+  var stops=[14,10,7,5,3,1].filter(function(d){return d<=span();}),i=0,HOLD=reduce?2200:1800;
   $("play").textContent="Playing";
   function step(){
     if(i<stops.length){sel=stops[i++];refresh();tour=setTimeout(step,HOLD);}
