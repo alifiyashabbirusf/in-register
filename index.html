@@ -358,10 +358,24 @@ function texture(S,scheme){
   x.putImageData(img,0,0);TEX[key]=c;return c;
 }
 function caption(ctx,S,a,color){tracked(ctx,S,a,SAFE*S,600,13,color,true);}
-function layers(ctx,S,scheme,text,fs,g,top){
-  var o=document.createElement("canvas");o.width=BW*S;o.height=BH*S;var x=o.getContext("2d");
-  if(scheme==="light"){big(x,S,text,fs,-g,-g*0.6,C.red,1,top);x.globalCompositeOperation="multiply";big(x,S,text,fs,g,g*0.6,C.indigo,1,top);}
-  else{big(x,S,text,fs,-g,-g*0.6,C.red,1,top);big(x,S,text,fs,g,g*0.6,C.cream,1,top);}
+function layers(ctx,S,scheme,text,fs,g,top,solid){
+  /* back layer: red printed as a halftone that grows into solid ink toward the bottom; front layer solid */
+  var W=BW*S,H=BH*S,o=document.createElement("canvas");o.width=W;o.height=H;var x=o.getContext("2d");
+  if(solid){big(x,S,text,fs,-g,-g*0.6,C.red,1,top);}
+  else{
+    var m=document.createElement("canvas");m.width=W;m.height=H;var mx=m.getContext("2d");big(mx,S,text,fs,-g,-g*0.6,"#000",1,top);
+    mx.font=(fs*S)+"px Anton, Impact, 'Arial Narrow', sans-serif";var mt=mx.measureText(text),y0=(top-g*0.6)*S,y1=y0+mt.actualBoundingBoxAscent+mt.actualBoundingBoxDescent;
+    var dc=document.createElement("canvas");dc.width=W;dc.height=H;var dx=dc.getContext("2d");
+    dx.fillStyle=scheme==="light"?C.cream:C.teal;dx.fillRect(0,0,W,H);dx.fillStyle=C.red;
+    var sp=7.2*S,ca=Math.SQRT1_2,R=Math.ceil(Math.hypot(W,H)/sp)+2;
+    for(var u=-R;u<=R;u++)for(var v=-R;v<=R;v++){
+      var px=(u*ca-v*ca)*sp,py=(u*ca+v*ca)*sp;if(px<-sp||px>W+sp||py<y0-sp||py>H+sp)continue;
+      var t=Math.max(0,Math.min(1,(py-y0)/Math.max(1,y1-y0))),r=sp*(0.30+0.46*Math.pow(t,1.1));
+      dx.beginPath();dx.arc(px,py,r,0,Math.PI*2);dx.fill();}
+    dx.globalCompositeOperation="destination-in";dx.drawImage(m,0,0);x.drawImage(dc,0,0);
+  }
+  if(scheme==="light"){x.globalCompositeOperation="multiply";big(x,S,text,fs,g,g*0.6,C.indigo,1,top);}
+  else{big(x,S,text,fs,g,g*0.6,C.cream,1,top);}
   ctx.drawImage(o,0,0);
 }
 /* n > 0 days left, n === 0 deadline day, n < 0 after. p is the 0..1 progress of the last-day animation. */
@@ -376,9 +390,9 @@ function draw(ctx,S,scheme,n,p){
   }
   if(n===0){
     var goCap=md(d)+" · DEADLINE",goLine=st.go.toUpperCase();
-    if(p!==undefined&&p<0.55){var q=p/0.55;layers(ctx,S,scheme,"GO",425,38*(1-q*q*q),372);caption(ctx,S,goCap,ink);headline(ctx,S,"",goLine,ink,ink);return;}
+    if(p!==undefined&&p<0.55){var q=p/0.55;layers(ctx,S,scheme,"GO",425,38*(1-q*q*q),372,true);caption(ctx,S,goCap,ink);headline(ctx,S,"",goLine,ink,ink);return;}
     var r=p===undefined?1:(p-0.55)/0.45, e=1-Math.pow(1-r,3);
-    if(r<1){layers(ctx,S,scheme,"GO",425,0,372);}
+    if(r<1){layers(ctx,S,scheme,"GO",425,0,372,true);}
     ctx.globalAlpha=e;ctx.fillStyle=C.red;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
     ctx.save();var sc=1+0.06*(1-e);ctx.translate(W/2,H*0.62);ctx.scale(sc,sc);ctx.translate(-W/2,-H*0.62);big(ctx,S,"GO",425,0,0,C.cream,e,372);ctx.restore();
     var gc=r<0.5?ink:C.cream;caption(ctx,S,goCap,gc);headline(ctx,S,"",goLine,gc,gc);return;
