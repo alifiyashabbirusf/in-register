@@ -343,11 +343,11 @@ function chips(ctx,S,n,ink){
     }else{
       path(ctx);ctx.fillStyle=ground;ctx.fill();
       var L=Math.ceil(cw+tip+6*S),Hh=Math.ceil(ch+6*S),ox=bx-3*S,oy=y-3*S;
-      var m=document.createElement("canvas");m.width=L;m.height=Hh;var mc=m.getContext("2d");mc.translate(-ox,-oy);path(mc);mc.lineWidth=2*S;mc.lineJoin="miter";mc.strokeStyle="#000";mc.stroke();
+      var m=document.createElement("canvas");m.width=L;m.height=Hh;var mc=m.getContext("2d");mc.translate(-ox,-oy);mc.beginPath();mc.moveTo(bx,y);mc.lineTo(bx+cw,y);mc.lineTo(bx+cw+tip,y+ch/2);mc.lineTo(bx+cw,y+ch);mc.lineTo(bx,y+ch);mc.lineWidth=1.8*S;mc.lineJoin="round";mc.strokeStyle="#000";mc.stroke();
       var dc=document.createElement("canvas");dc.width=L;dc.height=Hh;var dd=dc.getContext("2d");dd.fillStyle=ink;
       var sp2=2.4*S,ca=Math.SQRT1_2,R=Math.ceil(Math.hypot(L,Hh)/sp2)+2;
       for(var u=-R;u<=R;u++)for(var v=-R;v<=R;v++){var px=(u*ca-v*ca)*sp2,py=(u*ca+v*ca)*sp2;if(px<-sp2||px>L+sp2||py<-sp2||py>Hh+sp2)continue;
-        var t2=Math.max(0,Math.min(1,px/L)),r2=sp2*(0.30+0.50*Math.pow(t2,1.5));dd.beginPath();dd.arc(px,py,r2,0,Math.PI*2);dd.fill();}
+        var t2=Math.max(0,Math.min(1,px/L)),r2=sp2*(0.10+0.68*Math.pow(t2,1.5));dd.beginPath();dd.arc(px,py,r2,0,Math.PI*2);dd.fill();}
       dd.globalCompositeOperation="destination-in";dd.drawImage(m,0,0);ctx.drawImage(dc,ox,oy);
       ctx.font=fd;ctx.fillStyle=ink;run(ctx,dt,bx+(cw-width(ctx,dt,trD))/2,y+ch/2+0.5*S,trD);
     }
