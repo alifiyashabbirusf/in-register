@@ -421,9 +421,9 @@ function draw(ctx,S,scheme,n,p){
   }
   if(n===0){
     var goCap=md(d)+" · DEADLINE",goLine=st.go.toUpperCase();
-    if(p!==undefined&&p<0.55){var q=p/0.55;layers(ctx,S,scheme,"GO",425,38*(1-q*q*q),372,true);caption(ctx,S,goCap,ink);headline(ctx,S,"",goLine,ink,ink);return;}
+    if(p!==undefined&&p<0.55){var q=p/0.55;ctx.drawImage(texture(S,scheme),0,0);layers(ctx,S,scheme,"GO",425,38*(1-q*q*q),372);caption(ctx,S,goCap,ink);headline(ctx,S,"",goLine,ink,ink);return;}
     var r=p===undefined?1:(p-0.55)/0.45, e=1-Math.pow(1-r,3);
-    if(r<1){layers(ctx,S,scheme,"GO",425,0,372,true);}
+    if(r<1){ctx.drawImage(texture(S,scheme),0,0);layers(ctx,S,scheme,"GO",425,0,372);}
     ctx.globalAlpha=e;ctx.fillStyle=C.red;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
     ctx.save();var sc=1+0.06*(1-e);ctx.translate(W/2,H*0.62);ctx.scale(sc,sc);ctx.translate(-W/2,-H*0.62);goHalftone(ctx,S,e);ctx.restore();
     var gc=r<0.5?ink:C.cream;caption(ctx,S,goCap,gc);headline(ctx,S,"",goLine,gc,gc);return;
