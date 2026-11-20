@@ -378,6 +378,16 @@ function texture(S,scheme){
   }
   x.putImageData(img,0,0);TEX[key]=c;return c;
 }
+function goHalftone(ctx,S,alpha){
+  /* GO in cream, printed as a halftone that builds into solid ink toward the bottom */
+  var W=BW*S,H=BH*S,m=document.createElement("canvas");m.width=W;m.height=H;var mx=m.getContext("2d");big(mx,S,"GO",425,0,0,"#000",1,372);
+  mx.font=(425*S)+"px Anton, Impact, 'Arial Narrow', sans-serif";var mt=mx.measureText("GO"),y0=372*S,y1=y0+mt.actualBoundingBoxAscent+mt.actualBoundingBoxDescent;
+  var dc=document.createElement("canvas");dc.width=W;dc.height=H;var dx=dc.getContext("2d");dx.fillStyle=C.cream;
+  var sp=7.2*S,ca=Math.SQRT1_2,R=Math.ceil(Math.hypot(W,H)/sp)+2;
+  for(var u=-R;u<=R;u++)for(var v=-R;v<=R;v++){var px=(u*ca-v*ca)*sp,py=(u*ca+v*ca)*sp;if(px<-sp||px>W+sp||py<y0-sp||py>H+sp)continue;
+    var t=Math.max(0,Math.min(1,(py-y0)/Math.max(1,y1-y0))),r=sp*(0.40+0.38*Math.pow(t,1.1));dx.beginPath();dx.arc(px,py,r,0,Math.PI*2);dx.fill();}
+  dx.globalCompositeOperation="destination-in";dx.drawImage(m,0,0);ctx.globalAlpha=alpha;ctx.drawImage(dc,0,0);ctx.globalAlpha=1;
+}
 function caption(ctx,S,a,color){tracked(ctx,S,a,SAFE*S,600,13,color,true);}
 function layers(ctx,S,scheme,text,fs,g,top,solid){
   /* back layer: red printed as a halftone that grows into solid ink toward the bottom; front layer solid */
@@ -415,7 +425,7 @@ function draw(ctx,S,scheme,n,p){
     var r=p===undefined?1:(p-0.55)/0.45, e=1-Math.pow(1-r,3);
     if(r<1){layers(ctx,S,scheme,"GO",425,0,372,true);}
     ctx.globalAlpha=e;ctx.fillStyle=C.red;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
-    ctx.save();var sc=1+0.06*(1-e);ctx.translate(W/2,H*0.62);ctx.scale(sc,sc);ctx.translate(-W/2,-H*0.62);big(ctx,S,"GO",425,0,0,C.cream,e,372);ctx.restore();
+    ctx.save();var sc=1+0.06*(1-e);ctx.translate(W/2,H*0.62);ctx.scale(sc,sc);ctx.translate(-W/2,-H*0.62);goHalftone(ctx,S,e);ctx.restore();
     var gc=r<0.5?ink:C.cream;caption(ctx,S,goCap,gc);headline(ctx,S,"",goLine,gc,gc);return;
   }
   var cx=W/2,cy=480*S,R=55*S,tick=scheme==="light"?C.red:C.cream;ctx.lineCap="round";ctx.lineJoin="round";
